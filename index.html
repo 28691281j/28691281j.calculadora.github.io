@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora PWA</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #007bff, #6610f2);
+            background-size: 200% 200%;
+            animation: gradientAnimation 5s ease infinite;
+            margin: 0;
+        }
+
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .boton-contenedor {
+            text-align: center;
+        }
+
+        #miBoton {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        #miBoton:hover {
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.7);
+        }
+
+        #calculadora {
+            width: 340px;
+            height: 570px;
+            background-color: #eaedef;
+            border-radius: 5px;
+            position: absolute; /* Cambiado a absolute para ocultar inicialmente */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            display: none; /* Ocultar la calculadora al inicio */
+        }
+
+        #title {
+            text-align: center;
+            padding-top: 10px;
+        }
+
+        #resultado {
+            height: 120px;
+        }
+
+        .vsaida {
+            text-align: right;
+            height: 60px;
+            width: 275px;
+            margin: 10px 20px;
+            font-size: 30px;
+            outline: none;
+            border: none;
+        }
+
+        .teclado {
+            height: 400px;
+        }
+
+        .botaoAux,
+        .numero,
+        .limpar,
+        .divisao,
+        .soma,
+        .multiplicacao,
+        .subtracao,
+        .igual {
+            height: 50px;
+            width: 50px;
+            margin: 15px;
+            float: left;
+            border-radius: 50%;
+            border-width: 0;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .divisao {
+            font-size: 20px;
+            background-color: #70d6ff;
+        }
+
+        .soma {
+            font-size: 20px;
+            background-color: #ffd670;
+        }
+
+        .multiplicacao {
+            font-size: 20px;
+            background-color: #ff70a6;
+        }
+
+        .subtracao {
+            font-size: 20px;
+            background-color: #ff9770;
+        }
+
+        .igual {
+            font-size: 20px;
+            background-color: #e9ff70;
+        }
+
+        .numero {
+            background-color: #eaedef;
+        }
+
+        .botaoAux:active,
+        .numero:active,
+        .limpar:active,
+        .divisao:active,
+        .soma:active,
+        .multiplicacao:active,
+        .subtracao:active,
+        .igual:active {
+            font-size: 13px;
+        }
+
+        .botaoAux:focus,
+        .numero:focus,
+        .vazio:focus,
+        .limpar:focus,
+        .divisao:focus,
+        .soma:focus,
+        .multiplicacao:focus,
+        .subtracao:focus,
+        .igual:focus {
+            outline: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="boton-contenedor">
+        <button id="miBoton">¡Presióname!</button>
+    </div>
+    <div id="calculadora">
+        <form name="form">
+            <h1 id='title'>Calculadora</h1>
+            <input type="text" class="vsaida" id="visor" name="visor">
+        </form>
+        <table id="teclado">
+            <tr>
+                <td>
+                    <input type="button" class="limpar" id="buttonC" onclick="zerar()" value="C">
+                    <input type="button" class="botaoAux" id="backspace" onclick="backspace()" value="⌫">
+                    <input type="button" class="botaoAux" onclick="porcentagem()" value="%">
+                    <input type="button" class="divisao" id="divisao" onclick="operacao('/')" value="÷">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" class='numero' onclick="preencher(7)" value="7">
+                    <input type="button" class='numero' onclick="preencher(8)" value="8">
+                    <input type="button" class='numero' onclick="preencher(9)" value="9">
+                    <input type="button" class="multiplicacao" onclick="operacao('*')" value="x">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" class='numero' onclick="preencher(4)" value="4">
+                    <input type="button" class='numero' onclick="preencher(5)" value="5">
+                    <input type="button" class='numero' onclick="preencher(6)" value="6">
+                    <input type="button" class="subtracao" onclick="operacao('-')" value="-">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" class='numero' onclick="preencher(1)" value="1">
+                    <input type="button" class='numero' onclick="preencher(2)" value="2">
+                    <input type="button" class='numero' onclick="preencher(3)" value="3">
+                    <input type="button" class="soma" onclick="operacao('+')" value="+">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" class="botaoAux" id="negativo" onclick="maisMenos()" value="+/-">
+                    <input type="button" class='numero' onclick="preencher(0)" value="0">
+                    <input type="button" class="botaoAux" id="ponto" onclick="ponto()" value=".">
+                    <input type="button" class="igual" onclick='calcular()' value="=">
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+    <script>
+        const boton = document.getElementById('miBoton');
+        const calculadoraDiv = document.getElementById('calculadora');
+
+        boton.addEventListener('click', () => {
+            calculadoraDiv.style.display = 'block'; // Mostrar la calculadora
+            boton.style.display = 'none'; // Ocultar el botón
+        });
+
+        // Registro del Service Worker directamente en HTML
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("service-worker.js")
+                .then(reg => console.log("Service Worker registrado"))
+                .catch(err => console.log("Error al registrar el SW", err));
+        }
+    </script>
+
+    <script>
+        var valor1 = "";
+        var valor2 = "";
+        var resultado;
+        var operador = "";
+        var del;
+
+        function preencher(numero) {
+            var aux = document.getElementById("visor").value;
+            if (aux == "0") {
+                document.getElementById("visor").value = numero;
+            } else {
+                document.getElementById("visor").value += numero;
+            }
+        }
+
+        // Función para zerar o visor
+        function zerar() {
+            document.getElementById("visor").value = 0;
+            valor1 = "";
+            operador = "";
+        }
+
+        function operacao(sinal) {
+            if (valor1 == "") {
+                operador = sinal;
+                valor1 = parseFloat(document.getElementById("visor").value);
+                document.getElementById("visor").value = "";
+            } else {
+                switch (operador) {
+                    case "+":
+                        operador = sinal;
+                        valor2 = document.getElementById("visor").value;
+                        valor1 = parseFloat(valor1) + parseFloat(valor2);
+                        document.getElementById("visor").value = "";
+                        valor2 = "";
+                        break;
+                    case "-":
+                        operador = sinal;
+                        valor2 = document.getElementById("visor").value;
+                        valor1 = parseFloat(valor1) - parseFloat(valor2);
+                        document.getElementById("visor").value = "";
+                        valor2 = "";
+                        break;
+                    case "/":
+                        operador = sinal;
+                        valor2 = document.getElementById("visor").value;
+                        valor1 = parseFloat(valor1) / parseFloat(valor2);
+                        document.getElementById("visor").value = "";
+                        valor2 = "";
+                        break;
+                    case "*":
+                        operador = sinal;
+                        valor2 = document.getElementById("visor").value;
+                        valor1 = parseFloat(valor1) * parseFloat(valor2);
+                        document.getElementById("visor").value = "";
+                        valor2 = "";
+                        break;
+                    default:
+                        resultado = valor1;
+                        break;
+                }
+            }
+        }
+
+        function ponto() {
+            document.getElementById("visor").value += ".";
+        }
+
+        // Função para alterar para número positivo ou negativo
+        function maisMenos() {
+            if (document.getElementById("visor").value == "") {
+                document.getElementById("visor").value = "-";
+            } else {
+                document.getElementById("visor").value = "";
+            }
+        }
+
+        function calcular() {
+            switch (operador) {
+                case "+":
+                    resultado = valor1 + parseFloat(document.getElementById("visor").value);
+                    document.getElementById("visor").value = resultado.toLocaleString("pt-BR");
+                    break;
+                case "-":
+                    resultado = valor1 - parseFloat(document.getElementById("visor").value);
+                    document.getElementById("visor").value = resultado.toLocaleString("pt-BR");
+                    break;
+                case "/":
+                    resultado = valor1 / parseFloat(document.getElementById("visor").value);
+                    document.getElementById("visor").value = resultado.toLocaleString("pt-BR");
+                    break;
+                case "*":
+                    resultado = valor1 * parseFloat(document.getElementById("visor").value);
+                    document.getElementById("visor").value = resultado.toLocaleString("pt-BR");
+                    break;
+                default:
+                    resultado = valor1;
+                    document.getElementById("visor").value = resultado.toLocaleString("pt-BR");
+                    break;
+            }
+            valor1 = "";
+            operador = "";
+        }
+
+        function porcentagem() {
+            valor2 = parseFloat(document.getElementById("visor").value);
+            if (operador == "*") {
+                resultado = (valor1 / 100) * valor2;
+            }
+            document.getElementById("visor").value = resultado;
+        }
+
+        // Função para apagar o último número do visor
+        function backspace() {
+            del = document.getElementById("visor").value;
+            document.getElementById("visor").value = del.substring(0, del.length - 1);
+        }
+    </script>
+</body>
+
+</html>
